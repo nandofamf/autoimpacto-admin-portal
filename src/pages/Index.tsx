@@ -2,8 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Wrench, Shield, Award } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
-import { PromotionCard } from '@/components/promotions/PromotionCard';
-import { useActivePromotions } from '@/hooks/usePromotions';
+import { PromotionsCarousel } from '@/components/promotions/PromotionsCarousel';
 import heroBg from '@/assets/hero-bg.jpg';
 
 const features = [
@@ -25,8 +24,6 @@ const features = [
 ];
 
 const Index = () => {
-  const { promotions, loading } = useActivePromotions();
-
   return (
     <Layout>
       {/* Hero Section */}
@@ -95,7 +92,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Promotions Section */}
+      {/* Promotions Carousel Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -107,35 +104,16 @@ const Index = () => {
             </p>
           </div>
 
-          {loading ? (
-            <div className="flex justify-center">
-              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : promotions.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {promotions.slice(0, 3).map((promotion) => (
-                  <PromotionCard key={promotion.id} promotion={promotion} />
-                ))}
-              </div>
-              {promotions.length > 3 && (
-                <div className="text-center mt-10">
-                  <Button asChild variant="outline" size="lg">
-                    <Link to="/promociones">
-                      Ver todas las promociones
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </Button>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg">
-                No hay promociones activas en este momento. ¡Vuelve pronto!
-              </p>
-            </div>
-          )}
+          <PromotionsCarousel />
+
+          <div className="text-center mt-10">
+            <Button asChild variant="outline" size="lg">
+              <Link to="/productos">
+                Ver todos los productos
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
 
