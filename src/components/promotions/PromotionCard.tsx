@@ -1,13 +1,28 @@
-import { Calendar, Tag, Car } from 'lucide-react';
+import { Calendar, Tag, Car, ShoppingCart } from 'lucide-react';
 import { Promotion } from '@/types/promotion';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useCart } from '@/contexts/CartContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface PromotionCardProps {
   promotion: Promotion;
+  showAddToCart?: boolean;
 }
 
-export const PromotionCard = ({ promotion }: PromotionCardProps) => {
+export const PromotionCard = ({ promotion, showAddToCart = false }: PromotionCardProps) => {
+  const { addToCart } = useCart();
+  const { toast } = useToast();
+
+  const handleAddToCart = () => {
+    addToCart(promotion);
+    toast({
+      title: '¡Agregado al carrito!',
+      description: `${promotion.titulo} se agregó correctamente.`,
+    });
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('es-CL', {
       day: 'numeric',
@@ -58,7 +73,7 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
           {promotion.descripcion}
         </p>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-1 text-muted-foreground text-xs">
             <Calendar className="w-3 h-3" />
             <span>{formatDate(promotion.fecha_inicio)} - {formatDate(promotion.fecha_termino)}</span>
@@ -71,6 +86,13 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
             </span>
           </div>
         </div>
+
+        {showAddToCart && (
+          <Button onClick={handleAddToCart} className="w-full" variant="default">
+            <ShoppingCart className="w-4 h-4 mr-2" />
+            Agregar al carrito
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
