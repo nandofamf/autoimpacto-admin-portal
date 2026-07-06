@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Search } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
-import { PromotionCard } from '@/components/promotions/PromotionCard';
-import { useActivePromotions } from '@/hooks/usePromotions';
+import { ProductCard } from '@/components/products/ProductCard';
+import { useActiveProducts } from '@/hooks/useProducts';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -13,18 +13,21 @@ import {
 } from '@/components/ui/select';
 
 const Productos = () => {
-  const { promotions, loading } = useActivePromotions();
+  const { products, loading } = useActiveProducts();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedBrand, setSelectedBrand] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const brands = [...new Set(promotions.map((p) => p.marca_auto).filter(Boolean))];
+  const categories = [...new Set(products.map((p) => p.categoria).filter(Boolean))];
 
-  const filteredProducts = promotions.filter((promotion) => {
+  const filteredProducts = products.filter((product) => {
+    const term = searchTerm.toLowerCase();
     const matchesSearch =
-      promotion.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      promotion.descripcion.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesBrand = selectedBrand === 'all' || promotion.marca_auto === selectedBrand;
-    return matchesSearch && matchesBrand;
+      product.nombre.toLowerCase().includes(term) ||
+      product.descripcion.toLowerCase().includes(term) ||
+      product.marca_repuesto.toLowerCase().includes(term) ||
+      product.marca_auto.toLowerCase().includes(term);
+    const matchesCategory = selectedCategory === 'all' || product.categoria === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
 
   return (
@@ -36,7 +39,7 @@ const Productos = () => {
               Nuestros <span className="text-primary">Productos</span>
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Explora nuestra selección de repuestos y agrégalos al carrito para hacer tu pedido.
+              Explora nuestra selección de repuestos con stock real y agrégalos al carrito para hacer tu pedido.
             </p>
           </div>
 
@@ -45,21 +48,21 @@ const Productos = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
-                placeholder="Buscar productos..."
+                placeholder="Buscar por repuesto, marca o vehículo..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
-            <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-              <SelectTrigger className="w-full md:w-[200px]">
-                <SelectValue placeholder="Filtrar por marca" />
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-full md:w-[220px]">
+                <SelectValue placeholder="Filtrar por categoría" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas las marcas</SelectItem>
-                {brands.map((brand) => (
-                  <SelectItem key={brand} value={brand}>
-                    {brand}
+                <SelectItem value="all">Todas las categorías</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -74,13 +77,15 @@ const Productos = () => {
           ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredProducts.map((product) => (
-                <PromotionCard key={product.id} promotion={product} showAddToCart />
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground text-lg">
-                No se encontraron productos que coincidan con tu búsqueda.
+                {products.length === 0
+                  ? 'Pronto publicaremos nuestro catálogo de productos.'
+                  : 'No se encontraron productos que coincidan con tu búsqueda.'}
               </p>
             </div>
           )}
